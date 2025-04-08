@@ -1,0 +1,21 @@
+<html>
+<head>
+  <title>Book Explorer</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <h1>Saved Books</h1>
+  <form action="/search" method="get">
+    <input type="text" name="q" placeholder="Search books...">
+    <button type="submit">Search</button>
+  </form>
+  <ul>
+    <% books.forEach(book => { %>
+      <li>
+        <img src="<%= book.cover %>" alt="cover" width="100">
+        <strong><%= book.title %></strong> by <%= book.author %>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>
