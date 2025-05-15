@@ -1,29 +1,40 @@
-const express = require('express');
-const axios = require('axios');
-const pg = require('pg');
-const path = require('path');
-const app = express();
-const PORT = 3000;
+// index.js
+import express from 'express';
+import axios from 'axios';
+import pg from 'pg';
+import ejs from 'ejs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-// DB setup
+const app = express();
+
+// For resolving directory paths in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// PostgreSQL setup using environment variables (Render provides these)
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "books",
-    password: "srn",
-    port: 5432,
-  });
-  db.connect();
-  
+  connectionString: process.env.DATABASE_URL, // Render provides this
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+});
+db.connect();
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); // ensure views folder is located correctly
 
 // Routes
 app.get('/', async (req, res) => {
-  const dbBooks = await db.query('SELECT * FROM books');
-  res.render('index', { books: dbBooks.rows });
+  try {
+    const dbBooks = await db.query('SELECT * FROM books');
+    res.render('index', { books: dbBooks.rows });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching books from database.');
+  }
 });
 
 app.get('/search', async (req, res) => {
@@ -49,4 +60,6 @@ app.post('/add', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// Start server on Render's provided port
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
