@@ -1,7 +1,6 @@
-// index.js
 import express from 'express';
 import axios from 'axios';
-const pkg = await import('pg');
+import pkg from 'pg'; // <-- FIXED: static import
 import ejs from 'ejs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -11,16 +10,16 @@ const { Client } = pkg;
 
 const app = express();
 
-// For resolving directory paths in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// PostgreSQL setup using environment variables (Render provides these)
 const db = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 db.connect();
+
+// ...rest of your code...
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
