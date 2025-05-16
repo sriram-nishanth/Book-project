@@ -1,25 +1,16 @@
-import express from 'express';
-import axios from 'axios';
-import pkg from 'pg'; // <-- FIXED: static import
-import ejs from 'ejs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const { Client } = pkg;
+const express = require('express');
+const axios = require('axios');
+const { Client } = require('pg');
+const ejs = require('ejs');
+const path = require('path');
 
 const app = express();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const db = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 db.connect();
-
-// ...rest of your code...
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
