@@ -1,7 +1,7 @@
 // index.js
 import express from 'express';
 import axios from 'axios';
-import pkg from 'pg';
+const pkg = await import('pg');
 import ejs from 'ejs';
 import path from 'path';
 import { fileURLToPath } from 'url';
