@@ -1,11 +1,13 @@
 // index.js
 import express from 'express';
 import axios from 'axios';
-import pg from 'pg';
+import pkg from 'pg';
 import ejs from 'ejs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+
+const { Client } = pkg;
 
 const app = express();
 
@@ -14,8 +16,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // PostgreSQL setup using environment variables (Render provides these)
-const db = new pg.Client({
-  connectionString: process.env.DATABASE_URL, // Render provides this
+const db = new Client({
+  connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 db.connect();
