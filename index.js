@@ -1,16 +1,17 @@
 const express = require('express');
 const axios = require('axios');
-const { Client } = require('pg');
 const ejs = require('ejs');
+const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
 
-const db = new Client({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
-db.connect();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -21,7 +22,7 @@ app.set('views', path.join(__dirname, 'views')); // ensure views folder is locat
 // Routes
 app.get('/', async (req, res) => {
   try {
-    const dbBooks = await db.query('SELECT * FROM books');
+    const dbBooks = await pool.query('SELECT * FROM books');
     res.render('index', { books: dbBooks.rows });
   } catch (error) {
     console.error(error);
@@ -44,7 +45,7 @@ app.get('/search', async (req, res) => {
 app.post('/add', async (req, res) => {
   const { title, author, cover } = req.body;
   try {
-    await db.query('INSERT INTO books (title, author, cover) VALUES ($1, $2, $3)', [title, author, cover]);
+    await pool.query('INSERT INTO books (title, author, cover) VALUES ($1, $2, $3)', [title, author, cover]);
     res.redirect('/');
   } catch (error) {
     console.error(error);
